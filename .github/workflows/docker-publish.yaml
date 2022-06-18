@@ -3,7 +3,7 @@ name: Docker Build
 on:
   push:
     branches: [ "main" ]
-    paths-ignore:
+    paths:
       - "discord-gallerydl/**"
     # # Publish semver tags as releases.
     # tags: [ 'v*.*.*' ]
