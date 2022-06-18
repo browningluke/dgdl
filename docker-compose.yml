@@ -1,0 +1,11 @@
+version: '3.4'
+services:
+  dgdl:
+   image: "browningluke/dgdl:latest"
+   build: ./discord-gallerydl
+   environment:
+    - DISCORD_TOKEN
+    - LISTENING_CHANNELS
+   volumes:
+     - ./config.json:/config.json
+     - ./downloads:/gallery-dl
