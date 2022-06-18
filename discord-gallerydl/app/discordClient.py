@@ -1,31 +1,34 @@
-import asyncio, discord, validators
+import asyncio, discord, validators, logging
 from .gallery import GalleryDownloader
+
+from .defaults import LOGGER_NAME
+
+logger = logging.getLogger(LOGGER_NAME)
 
 class DiscordClient(discord.Client):
 
-    def __init__(self, listeningChannels):
+    def __init__(self, mappings):
         self._loop = asyncio.get_event_loop()
         super().__init__(loop=self._loop)
 
         self._galleryDownloader = GalleryDownloader(self._loop)
-        self._listeningChannels = listeningChannels
+        self._mappings = mappings
+        self._listeningChannels = list(mappings.keys())
+
+        logging.info(f"Monitoring channels: {self._listeningChannels}")
+
         self._setup()
 
     def _setup(self):
-        self._initCommandsAndEvents()
-        pass
-
-    def _initCommandsAndEvents(self):
-
         @self.event
         async def on_ready():
-            print(f"Logged in as {self.user}")
+            logger.info(f"Logged in as {self.user}")
 
         @self.event
         async def on_message(message):
-            if message.channel.id in self._listeningChannels:
+            if str(message.channel.id) in self._listeningChannels:
                 if DiscordClient._ensureValidURL(message.content):
-                    print(message.content)
+                    logger.info(f"({message.channel.id}) Caught URL: {message.content}")
 
                     await message.add_reaction("📥")
                     await message.add_reaction("↔️")
@@ -45,13 +48,17 @@ class DiscordClient(discord.Client):
                     await message.clear_reactions()
                     await message.add_reaction("🔄")
 
+                    path = self._mappings[str(message.channel.id)]
+                    logger.info(f"Mapping to path: {path}")
+
                     # Do download
                     try:
-                        status = await self._galleryDownloader.download(message.content)
+                        status = await self._galleryDownloader.download(message.content, path=path)
                         if status != 0: raise
-                    except Exception:
+                    except Exception as e:
                         await message.clear_reactions()
                         await message.add_reaction("❌")
+                        logger.error(e, exc_info=1)
                         return
 
                     await message.clear_reactions()
@@ -59,9 +66,9 @@ class DiscordClient(discord.Client):
                     for x in reaction_list:
                         await message.add_reaction(x)
                 else:
-                    print(f"Ignoring (wrong type): {message.content}")
+                    logger.info(f"Ignoring (wrong type): {message.content}")
             else:
-                print(f"Ignoring (outside channel): {message.content}")
+                logger.info(f"Ignoring (outside channel): {message.content}")
 
     @staticmethod
     def _ensureValidURL(string):
@@ -71,7 +78,7 @@ class DiscordClient(discord.Client):
         try:
             self._loop.run_until_complete(self.start(token))
         except KeyboardInterrupt:
-            print("Logging out")
+            logger.info("Logging out")
             self._loop.run_until_complete(self.close())
             # cancel all tasks lingering
         finally:

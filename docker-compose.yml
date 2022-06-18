@@ -5,7 +5,7 @@ services:
    build: ./discord-gallerydl
    environment:
     - DISCORD_TOKEN
-    - LISTENING_CHANNELS
    volumes:
      - ./config.json:/config.json
+     - ./mappings.json:/mappings.json
      - ./downloads:/gallery-dl

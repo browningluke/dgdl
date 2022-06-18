@@ -1,8 +1,12 @@
-import os, asyncio
+import os, asyncio, logging
 from gallery_dl import config, job
 
-DEFAULT_PATH = "/gallery-dl/"
-CONFIG_PATH = os.getenv("DL_CONFIG_PATH", "/config.json")
+from .defaults import GDL_DOWNLOAD_PATH, GDL_CONFIG_PATH, LOGGER_NAME
+
+logger = logging.getLogger(LOGGER_NAME)
+
+DOWNLOAD_PATH = os.getenv("GDL_DOWNLOAD_PATH", GDL_DOWNLOAD_PATH)
+CONFIG_PATH = os.getenv("GDL_CONFIG_PATH", GDL_CONFIG_PATH)
 
 class GalleryDownloader:
 
@@ -13,8 +17,10 @@ class GalleryDownloader:
     def _setup(self):
         config.load([CONFIG_PATH])
 
-    async def download(self, url, path=DEFAULT_PATH):
+    async def download(self, url, path=GDL_DOWNLOAD_PATH):
         config.set(("extractor",), "base-directory", path)
+
+        logging.info(f"Attempting download to path: {path}")
         
         downloadJob = job.DownloadJob(url)
         return await self._loop.run_in_executor(None, downloadJob.run)
