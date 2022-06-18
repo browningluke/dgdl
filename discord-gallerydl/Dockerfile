@@ -1,11 +1,6 @@
-FROM python:3
+FROM python:alpine3.9
 
-# ARG UNAME=dgdl
-# ARG UID=1000
-# ARG GID=1000
-# RUN groupadd -g $GID -o $UNAME
-# RUN useradd -m -u $UID -g $GID -o -s /bin/bash $UNAME
-# USER $UNAME
+RUN pip install --upgrade pip
 
 WORKDIR /dgdl
 
