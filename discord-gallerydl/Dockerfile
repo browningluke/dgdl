@@ -1,6 +1,7 @@
 FROM python:alpine3.9
 
 RUN pip install --upgrade pip
+RUN apk add  --no-cache ffmpeg
 
 WORKDIR /dgdl
 
