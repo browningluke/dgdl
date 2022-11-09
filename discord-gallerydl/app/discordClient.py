@@ -30,24 +30,25 @@ class DiscordClient(discord.Client):
                 if DiscordClient._ensureValidURL(message.content):
                     logger.info(f"({message.channel.id}) Caught URL: {message.content}")
 
-                    await message.add_reaction("📥")
-                    # await message.add_reaction("↔️")
-                    # await message.add_reaction("↕️")
+                    if not message.user.bot:
+                        await message.add_reaction("📥")
+                        # await message.add_reaction("↔️")
+                        # await message.add_reaction("↕️")
 
-                    reaction, user = await self.wait_for('reaction_add',
-                        check=lambda reaction, user: 
-                            # user == message.author and str(reaction.emoji) == "📥",
-                            str(reaction.emoji) == "📥",
-                        timeout=(60 * 60 * 2))
+                        reaction, user = await self.wait_for('reaction_add',
+                            check=lambda reaction, user: 
+                                # user == message.author and str(reaction.emoji) == "📥",
+                                str(reaction.emoji) == "📥",
+                            timeout=(60 * 60 * 2))
 
-                    # Clear reactions
-                    reaction_list = []
-                    for x in message.reactions:
-                        if x.count > 1 and str(x.emoji) != "📥":
-                            reaction_list.append(x)
+                        # Clear reactions
+                        reaction_list = []
+                        for x in message.reactions:
+                            if x.count > 1 and str(x.emoji) != "📥":
+                                reaction_list.append(x)
 
-                    await message.clear_reactions()
-                    await message.add_reaction("🔄")
+                        await message.clear_reactions()
+                        await message.add_reaction("🔄")
 
                     path = self._mappings[str(message.channel.id)]
                     logger.info(f"Mapping to path: {path}")
