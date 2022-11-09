@@ -31,12 +31,13 @@ class DiscordClient(discord.Client):
                     logger.info(f"({message.channel.id}) Caught URL: {message.content}")
 
                     await message.add_reaction("📥")
-                    await message.add_reaction("↔️")
-                    await message.add_reaction("↕️")
+                    # await message.add_reaction("↔️")
+                    # await message.add_reaction("↕️")
 
                     reaction, user = await self.wait_for('reaction_add',
                         check=lambda reaction, user: 
-                            user == message.author and str(reaction.emoji) == "📥",
+                            # user == message.author and str(reaction.emoji) == "📥",
+                            str(reaction.emoji) == "📥",
                         timeout=(60 * 60 * 2))
 
                     # Clear reactions
