@@ -30,16 +30,23 @@ class DiscordClient(discord.Client):
                 if DiscordClient._ensureValidURL(message.content):
                     logger.info(f"({message.channel.id}) Caught URL: {message.content}")
 
-                    if not message.user.bot:
+                    if not message.author.bot:
+                        logger.info("User is not a bot, asking for confirmation...")
                         await message.add_reaction("📥")
                         # await message.add_reaction("↔️")
                         # await message.add_reaction("↕️")
 
-                        reaction, user = await self.wait_for('reaction_add',
-                            check=lambda reaction, user: 
-                                # user == message.author and str(reaction.emoji) == "📥",
-                                str(reaction.emoji) == "📥",
-                            timeout=(60 * 60 * 2))
+                        try:
+                            reaction, user = await self.wait_for('reaction_add',
+                                        check=lambda reaction, user: 
+                                            user == message.author 
+                                            and str(reaction.emoji) == "📥"
+                                            and reaction.message.id == message.id,
+                                        timeout=(60 * 60 * 2))
+                        except asyncio.TimeoutError:
+                            logging.warn(f"Reaction confirmation timed out for m.id: {message.id}")
+                            await message.remove_reaction("📥")
+                            return
 
                     # Clear reactions
                     reaction_list = []
