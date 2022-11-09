@@ -41,14 +41,14 @@ class DiscordClient(discord.Client):
                                 str(reaction.emoji) == "📥",
                             timeout=(60 * 60 * 2))
 
-                        # Clear reactions
-                        reaction_list = []
-                        for x in message.reactions:
-                            if x.count > 1 and str(x.emoji) != "📥":
-                                reaction_list.append(x)
+                    # Clear reactions
+                    reaction_list = []
+                    for x in message.reactions:
+                        if x.count > 1 and str(x.emoji) != "📥":
+                            reaction_list.append(x)
 
-                        await message.clear_reactions()
-                        await message.add_reaction("🔄")
+                    await message.clear_reactions()
+                    await message.add_reaction("🔄")
 
                     path = self._mappings[str(message.channel.id)]
                     logger.info(f"Mapping to path: {path}")
