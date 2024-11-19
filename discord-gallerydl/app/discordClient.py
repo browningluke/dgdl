@@ -10,7 +10,10 @@ class DiscordClient(discord.Client):
 
     def __init__(self, mappings):
         self._loop = asyncio.get_event_loop()
-        super().__init__(loop=self._loop, intents=discord.Intents.default())
+
+        intents = discord.Intents.default()
+        intents.message_content = True
+        super().__init__(loop=self._loop, intents=intents)
 
         self._galleryDownloader = GalleryDownloader(self._loop)
         self._mappings = mappings
