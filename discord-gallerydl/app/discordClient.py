@@ -5,11 +5,12 @@ from .defaults import LOGGER_NAME
 
 logger = logging.getLogger(LOGGER_NAME)
 
+
 class DiscordClient(discord.Client):
 
     def __init__(self, mappings):
         self._loop = asyncio.get_event_loop()
-        super().__init__(loop=self._loop)
+        super().__init__(loop=self._loop, intents=discord.Intents.default())
 
         self._galleryDownloader = GalleryDownloader(self._loop)
         self._mappings = mappings
@@ -37,14 +38,17 @@ class DiscordClient(discord.Client):
                         # await message.add_reaction("↕️")
 
                         try:
-                            reaction, user = await self.wait_for('reaction_add',
-                                        check=lambda reaction, user: 
-                                            user == message.author 
-                                            and str(reaction.emoji) == "📥"
-                                            and reaction.message.id == message.id,
-                                        timeout=(60 * 60 * 2))
+                            reaction, user = await self.wait_for(
+                                "reaction_add",
+                                check=lambda reaction, user: user == message.author
+                                and str(reaction.emoji) == "📥"
+                                and reaction.message.id == message.id,
+                                timeout=(60 * 60 * 2),
+                            )
                         except asyncio.TimeoutError:
-                            logging.warn(f"Reaction confirmation timed out for m.id: {message.id}")
+                            logging.warn(
+                                f"Reaction confirmation timed out for m.id: {message.id}"
+                            )
                             await message.remove_reaction("📥")
                             return
 
@@ -62,8 +66,11 @@ class DiscordClient(discord.Client):
 
                     # Do download
                     try:
-                        status = await self._galleryDownloader.download(message.content, path=path)
-                        if status != 0: raise
+                        status = await self._galleryDownloader.download(
+                            message.content, path=path
+                        )
+                        if status != 0:
+                            raise
                     except Exception as e:
                         await message.clear_reactions()
                         await message.add_reaction("❌")

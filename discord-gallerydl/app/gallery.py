@@ -8,6 +8,7 @@ logger = logging.getLogger(LOGGER_NAME)
 DOWNLOAD_PATH = os.getenv("GDL_DOWNLOAD_PATH", GDL_DOWNLOAD_PATH)
 CONFIG_PATH = os.getenv("GDL_CONFIG_PATH", GDL_CONFIG_PATH)
 
+
 class GalleryDownloader:
 
     def __init__(self, loop=None):
@@ -21,6 +22,6 @@ class GalleryDownloader:
         config.set(("extractor",), "base-directory", path)
 
         logging.info(f"Attempting download to path: {path}")
-        
+
         downloadJob = job.DownloadJob(url)
         return await self._loop.run_in_executor(None, downloadJob.run)
